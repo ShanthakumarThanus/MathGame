@@ -1,101 +1,25 @@
-import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
-import { useState, useEffect } from 'react';
-
-const MAX_NUMBER = 50; 
-const MAX_TIME = 5
-
-const rndNumber = () => {
-  return (Math.floor(Math.random()*MAX_NUMBER)); 
-}
-
-const formatTime = (time) => {
-  if (time<10) {
-    return ('00 : 0'+time)
-  }
-  else {
-    return ('00 : '+time)
-  }
-}
+import React, { useState } from "react";
+import { View, Text, Button } from "react-native";
+import MathGame from "./MathGame"; // 🔹 Vérifie le bon import
 
 export default function App() {
-  const [numberOne, setNumberOne] = useState(rndNumber());
-  const [numberTwo, setNumberTwo] = useState(rndNumber());
-  const [solution, setSolution] = useState(); 
-  const [userAnswer, setUserAnswer] = useState(0); 
-  const [msg, setMsg] = useState(''); 
+  const [difficulty, setDifficulty] = useState(null);
 
-  // State pour le timer
-  const [timeLeft, setTimeLeft] = useState(MAX_TIME); 
-  const [btnEnabled, setBtnEnabled] = useState(true); 
-
-  useEffect(() => {
-    setSolution(() => (numberOne+numberTwo))
-  }, [numberOne, numberTwo])
-
-  // Créer le timer avec setInterval
-  useEffect(() => {
-    const timer = setInterval(decreaseTime, 1000)
-    return (() => clearInterval(timer))
-  }, [])
-
-  // useEffect pour vérifier quand le timer est à 0 
-  useEffect(() => {
-    if (timeLeft==0) {
-      setBtnEnabled(false); 
-      // clearInterval(timer); 
-      setMsg('Temps écoulé, la bonne réponse était '+solution)
-    }
-  }, [timeLeft])
-
-  const decreaseTime = () => {
-    setTimeLeft((timeLeft) => Math.max(timeLeft-1, 0))
+  if (difficulty) {
+    return <MathGame difficulty={difficulty} onBack={() => setDifficulty(null)} />; // 🔹 Vérifie que `onBack` est bien passé
   }
 
-  const handleSubmit = () => {
-    if (userAnswer==solution) {
-      setMsg('Bonne réponse')
-    }
-    else {
-      setMsg('Mauvaise réponse, la réponse était '+solution)
-    }
-
-  }
   return (
-    <View style={styles.container}>
-      <Button 
-        title='New Game' 
-        onPress={handleSubmit}
-        disabled={!btnEnabled}
-      />
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <Text style={{ fontSize: 24, fontWeight: "bold" }}>Choisis la difficulté</Text>
 
-      <Button 
-        title='Submit' 
-        onPress={handleSubmit}
-        disabled={!btnEnabled}
-      />
+      <View style={{ marginVertical: 10 }}>
+        <Button title="Easy" onPress={() => setDifficulty("easy")} />
+      </View>
 
-      <Text>{formatTime(timeLeft)}</Text>
-      <Text>{numberOne} + {numberTwo} = </Text>
-      <TextInput 
-        placeholder='Enter your answer here'
-        keyboardType='numeric'
-        onChangeText={setUserAnswer}
-      />
-      <Button 
-        title='Submit' 
-        onPress={handleSubmit}
-        disabled={!btnEnabled}
-        />
-      <Text>{msg}</Text>
+      <View style={{ marginVertical: 10 }}>
+        <Button title="Hard" onPress={() => setDifficulty("hard")} />
+      </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
